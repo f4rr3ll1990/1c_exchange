@@ -5,7 +5,33 @@ ini_set('error_reporting', -1);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
-include_once ($_SERVER['DOCUMENT_ROOT'].'/functions/functions.php');
+function fs_clear($dir, $del = FALSE) {
+	if ($objs = glob($dir."/*")) {
+       foreach($objs as $obj) {
+         is_dir($obj) ? fs_clear($obj, TRUE) : unlink($obj);
+       }
+    }
+    if ($del) { rmdir($dir); }
+}
+
+function zip_unpack($from, $to) {
+	if (file_exists($from)) {
+		$zip = new ZipArchive();	
+		foreach (glob($from.'/*.zip') as $file) {
+			$zip->open($file);
+			$zip->extractTo($to);
+			$zip->close();
+		}
+	}
+}
+
+function asBytes($ini_v) {
+	if ($ini_v) {
+		$ini_v = trim($ini_v);
+		$s = array('g'=> 1<<30, 'm' => 1<<20, 'k' => 1<<10);
+		return intval($ini_v) * ($s[strtolower(substr($ini_v,-1))] ?: 1);
+	}
+}
 
 $user	= "username";
 $pass	= "password";
